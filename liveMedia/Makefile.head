@@ -1,4 +1,7 @@
 INCLUDES = -Iinclude -I../UsageEnvironment/include -I../groupsock/include
 PREFIX = /usr/local
 LIBDIR = $(PREFIX)/lib
+libBasicUsageEnvironment_LIB_SUFFIX = $(STATIC_LIB_SUFFIX)
+libUsageEnvironment_LIB_SUFFIX = $(STATIC_LIB_SUFFIX)
+libgroupsock_LIB_SUFFIX = $(STATIC_LIB_SUFFIX)
 ##### Change the following for your environment:

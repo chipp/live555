@@ -1,7 +1,7 @@
 ##### End of variables to change
 
 NAME = libgroupsock
-ALL = $(NAME).$(LIB_SUFFIX)
+ALL = $(NAME).$(STATIC_LIB_SUFFIX)
 all:	$(ALL)
 
 .$(C).$(OBJ):
@@ -24,21 +24,16 @@ NetInterface.$(CPP):	include/NetInterface.hh include/GroupsockHelper.hh
 NetAddress.$(CPP):	include/NetAddress.hh include/GroupsockHelper.hh
 IOHandlers.$(CPP):	include/IOHandlers.hh
 
-libgroupsock.$(LIB_SUFFIX): $(GROUPSOCK_LIB_OBJS) \
+libgroupsock.$(STATIC_LIB_SUFFIX): $(GROUPSOCK_LIB_OBJS) \
     $(PLATFORM_SPECIFIC_LIB_OBJS)
-	$(LIBRARY_LINK)$@ $(LIBRARY_LINK_OPTS) \
+	$(STATIC_LIBRARY_LINK)$@ $(STATIC_LIBRARY_LINK_OPTS) \
 		$(GROUPSOCK_LIB_OBJS)
 
 clean:
 	-rm -rf *.$(OBJ) $(ALL) core *.core *~ include/*~
 
-install: install1 $(INSTALL2)
-install1: libgroupsock.$(LIB_SUFFIX)
-	  install -d $(DESTDIR)$(PREFIX)/include/groupsock $(DESTDIR)$(LIBDIR)
-	  install -m 644 include/*.hh include/*.h $(DESTDIR)$(PREFIX)/include/groupsock
-	  install -m 644 libgroupsock.$(LIB_SUFFIX) $(DESTDIR)$(LIBDIR)
-install_shared_libraries: libgroupsock.$(LIB_SUFFIX)
-	  ln -fs libgroupsock.$(LIB_SUFFIX) $(DESTDIR)$(LIBDIR)/libgroupsock.$(SHORT_LIB_SUFFIX)
-	  ln -fs libgroupsock.$(LIB_SUFFIX) $(DESTDIR)$(LIBDIR)/libgroupsock.so
+install:
+	install -d $(DESTDIR)/Headers
+	install -m 644 include/*.hh include/*.h $(DESTDIR)/Headers
 
 ##### Any additional, platform-specific rules come here:

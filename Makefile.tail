@@ -14,36 +14,30 @@ PROXY_SERVER_DIR = proxyServer
 HLS_PROXY_DIR = hlsProxy
 
 all:
-	cd $(LIVEMEDIA_DIR) ; $(MAKE)
 	cd $(GROUPSOCK_DIR) ; $(MAKE)
 	cd $(USAGE_ENVIRONMENT_DIR) ; $(MAKE)
 	cd $(BASIC_USAGE_ENVIRONMENT_DIR) ; $(MAKE)
+	cd $(LIVEMEDIA_DIR) ; $(MAKE)
+ifeq ($(SKIP_CONSOLE_APPLICATIONS), 0)
 	cd $(TESTPROGS_DIR) ; $(MAKE)
 	cd $(MEDIA_SERVER_DIR) ; $(MAKE)
 	cd $(PROXY_SERVER_DIR) ; $(MAKE)
 	cd $(HLS_PROXY_DIR) ; $(MAKE)
+endif
 	@echo
 	@echo "For more information about this source code (including your obligations under the LGPL), please see our FAQ at http://live555.com/liveMedia/faq.html"
-
-install:
-	cd $(LIVEMEDIA_DIR) ; $(MAKE) install
-	cd $(GROUPSOCK_DIR) ; $(MAKE) install
-	cd $(USAGE_ENVIRONMENT_DIR) ; $(MAKE) install
-	cd $(BASIC_USAGE_ENVIRONMENT_DIR) ; $(MAKE) install
-	cd $(TESTPROGS_DIR) ; $(MAKE) install
-	cd $(MEDIA_SERVER_DIR) ; $(MAKE) install
-	cd $(PROXY_SERVER_DIR) ; $(MAKE) install
-	cd $(HLS_PROXY_DIR) ; $(MAKE) install
 
 clean:
 	cd $(LIVEMEDIA_DIR) ; $(MAKE) clean
 	cd $(GROUPSOCK_DIR) ; $(MAKE) clean
 	cd $(USAGE_ENVIRONMENT_DIR) ; $(MAKE) clean
 	cd $(BASIC_USAGE_ENVIRONMENT_DIR) ; $(MAKE) clean
+ifeq ($(SKIP_CONSOLE_APPLICATIONS), 0)
 	cd $(TESTPROGS_DIR) ; $(MAKE) clean
 	cd $(MEDIA_SERVER_DIR) ; $(MAKE) clean
 	cd $(PROXY_SERVER_DIR) ; $(MAKE) clean
 	cd $(HLS_PROXY_DIR) ; $(MAKE) clean
+endif
 
 distclean: clean
 	-rm -f $(LIVEMEDIA_DIR)/Makefile $(GROUPSOCK_DIR)/Makefile \

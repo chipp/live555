@@ -1,17 +1,32 @@
-COMPILE_OPTS =		$(INCLUDES) -I. -I/usr/local/include $(EXTRA_LDFLAGS) -DBSD=1 -O -DSOCKLEN_T=socklen_t -DHAVE_SOCKADDR_LEN=1 -DTIME_BASE=int -DNEED_XLOCALE_H=1 -DNO_OPENSSL=1
-C =			c
-C_COMPILER =		cc
-C_FLAGS =		$(COMPILE_OPTS)
-CPP =			cpp
-CPLUSPLUS_COMPILER =	c++
-CPLUSPLUS_FLAGS =	$(COMPILE_OPTS) -Wall
-OBJ =			o
-LINK =			c++ -o 
-LINK_OPTS =		-L.
-CONSOLE_LINK_OPTS =	$(LINK_OPTS)
-LIBRARY_LINK =		libtool -s -o 
-LIBRARY_LINK_OPTS =	
-LIB_SUFFIX =			a
-LIBS_FOR_CONSOLE_APPLICATION = 
+DEVELOPER_PATH =                /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer
+TOOL_PATH =                     $(DEVELOPER_PATH)/usr/bin
+SDK_PATH =                      $(DEVELOPER_PATH)/SDKs
+SDK =                           $(SDK_PATH)/MacOSX15.2.sdk
+COMPILE_OPTS =                  $(INCLUDES) -I/usr/local/include -I. $(EXTRA_LDFLAGS) -DBSD=1 -O2 -DSOCKLEN_T=socklen_t -DHAVE_SOCKADDR_LEN=1 -D_LARGEFILE_SOURCE=1 -D_FILE_OFFSET_BITS=64 -fPIC -isysroot $(SDK) -target arm64-apple-darwin24.1.0 -DNO_OPENSSL=1 -DLOCALE_NOT_USED=1 -DNEED_XLOCALE_H=1
+
+C =                             c
+C_COMPILER =                    /usr/bin/xcrun clang
+C_FLAGS =                       $(COMPILE_OPTS)
+
+CPP =                           cpp
+CPLUSPLUS_COMPILER =            /usr/bin/xcrun clang
+CPLUSPLUS_FLAGS =               $(COMPILE_OPTS) -Wall
+
+OBJ =                           o
+LINK =                          /usr/bin/xcrun clang -o
+LINK_OPTS =                     -v -Xlinker -L. -isysroot $(SDK) -target arm64-apple-darwin24.1.0 -L$(SDK)/usr/lib -lc++
+
+DYNAMIC_LIBRARY_LINK =          $(LINK)
+DYNAMIC_LIBRARY_LINK_OPTS =     $(LINK_OPTS) -dynamiclib -current_version 1.0 -compatibility_version 1.0 \
+                                    -isysroot $(SDK) -target arm64-apple-darwin24.1.0
+DYNAMIC_LIB_SUFFIX =            dylib
+
+STATIC_LIBRARY_LINK =           /usr/bin/xcrun libtool -static -o 
+STATIC_LIBRARY_LINK_OPTS =
+STATIC_LIB_SUFFIX =             a
+
+SKIP_CONSOLE_APPLICATIONS =     0
+CONSOLE_LINK_OPTS =             $(LINK_OPTS)
+LIBS_FOR_CONSOLE_APPLICATION =
 LIBS_FOR_GUI_APPLICATION =
 EXE =

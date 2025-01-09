@@ -8,7 +8,7 @@ declare -a PLATFORMS=("macosx-no-openssl" "xros" "xrsimulator" "ios" "iossimulat
 
 for PLATFORM in "${PLATFORMS[@]}"; do
     ./genMakefiles "$PLATFORM"
-    make -j8
+    make
 
     mkdir -p "build/$PLATFORM"
     mv liveMedia/liveMedia.framework "build/$PLATFORM"

@@ -5,15 +5,15 @@ SDK =							$(SDK_PATH)/iPhoneOS.sdk
 COMPILE_OPTS =					$(INCLUDES) -I/usr/local/include -I. $(EXTRA_LDFLAGS) -DBSD=1 -O2 -DSOCKLEN_T=socklen_t -DHAVE_SOCKADDR_LEN=1 -D_LARGEFILE_SOURCE=1 -D_FILE_OFFSET_BITS=64 -fPIC -isysroot $(SDK) -target arm64-apple-ios18.2 -DNO_OPENSSL=1 -DLOCALE_NOT_USED=1 -DNEED_XLOCALE_H=1
 
 C =								c
-C_COMPILER =					/usr/bin/xcrun clang
+C_COMPILER =					clang
 C_FLAGS =						$(COMPILE_OPTS)
 
 CPP =							cpp
-CPLUSPLUS_COMPILER =			/usr/bin/xcrun clang
+CPLUSPLUS_COMPILER =			clang
 CPLUSPLUS_FLAGS =				$(COMPILE_OPTS) -Wall
 
 OBJ =							o
-LINK =							/usr/bin/xcrun clang -o 
+LINK =							clang -o 
 LINK_OPTS =						-v -Xlinker -L. -isysroot $(SDK) -target arm64-apple-ios18.2 -L$(SDK)/usr/lib -lc++
 
 DYNAMIC_LIBRARY_LINK =			$(LINK)
@@ -21,7 +21,7 @@ DYNAMIC_LIBRARY_LINK_OPTS =		$(LINK_OPTS) -dynamiclib -current_version 1.0 -comp
 									-isysroot $(SDK) -target arm64-apple-ios18.2
 DYNAMIC_LIB_SUFFIX =			dylib
 
-STATIC_LIBRARY_LINK =			/usr/bin/xcrun libtool -static -o 
+STATIC_LIBRARY_LINK =			libtool -static -o 
 STATIC_LIBRARY_LINK_OPTS =		
 STATIC_LIB_SUFFIX =				a
 
@@ -29,4 +29,4 @@ SKIP_CONSOLE_APPLICATIONS =		1
 CONSOLE_LINK_OPTS =				$(LINK_OPTS)
 LIBS_FOR_CONSOLE_APPLICATION =	
 LIBS_FOR_GUI_APPLICATION =		
-EXE =							
+EXE =

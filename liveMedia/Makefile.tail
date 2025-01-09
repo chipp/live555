@@ -113,15 +113,13 @@ $(LIVEMEDIA_HEADERS): $(LIVEMEDIA_FRAMEWORK)/Headers
 			s/#include <NetCommon.h>/#include <liveMedia\/NetCommon.h>/g' include/$(notdir $@) > $@
 	echo "  header \"$(notdir $@)\"" >> $(LIVEMEDIA_FRAMEWORK)/Modules/module.modulemap
 
-LIVEMEDIA_FRAMEWORK_HEADERS = $(USAGE_ENVIRONMENT_HEADERS) $(BASIC_USAGE_ENVIRONMENT_HEADERS) $(GROUPSOCK_HEADERS) $(LIVEMEDIA_HEADERS)
-
 $(LIVEMEDIA_FRAMEWORK)/Modules/module.modulemap:
 	install -d $(LIVEMEDIA_FRAMEWORK)/Modules
 	echo "framework module liveMedia {" > $(LIVEMEDIA_FRAMEWORK)/Modules/module.modulemap
 	echo "  requires cplusplus" >> $(LIVEMEDIA_FRAMEWORK)/Modules/module.modulemap
 	echo "  umbrella header \"liveMedia.hh\"" >> $(LIVEMEDIA_FRAMEWORK)/Modules/module.modulemap
 
-$(LIVEMEDIA_FRAMEWORK): $(LIVEMEDIA_LIB) $(LIVEMEDIA_FRAMEWORK)/Modules/module.modulemap $(LIVEMEDIA_FRAMEWORK_HEADERS)
+$(LIVEMEDIA_FRAMEWORK): $(LIVEMEDIA_LIB) | $(LIVEMEDIA_FRAMEWORK)/Modules/module.modulemap $(USAGE_ENVIRONMENT_HEADERS) $(BASIC_USAGE_ENVIRONMENT_HEADERS) $(GROUPSOCK_HEADERS) $(LIVEMEDIA_HEADERS)
 	echo "}" >> $(LIVEMEDIA_FRAMEWORK)/Modules/module.modulemap
 	install -m 644 Info.plist $(LIVEMEDIA_FRAMEWORK)
 

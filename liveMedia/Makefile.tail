@@ -2,8 +2,9 @@
 
 NAME = liveMedia
 LIVEMEDIA_FRAMEWORK = $(NAME).framework
+LIVEMEDIA_DSYM = $(LIVEMEDIA_FRAMEWORK).dSYM
 LIVEMEDIA_LIB = $(LIVEMEDIA_FRAMEWORK)/$(NAME)
-ALL = $(LIVEMEDIA_FRAMEWORK)
+ALL = $(LIVEMEDIA_FRAMEWORK) $(LIVEMEDIA_DSYM)
 all:	$(ALL)
 
 .$(C).$(OBJ):
@@ -122,6 +123,11 @@ $(LIVEMEDIA_FRAMEWORK)/Modules/module.modulemap:
 $(LIVEMEDIA_FRAMEWORK): $(LIVEMEDIA_LIB) | $(LIVEMEDIA_FRAMEWORK)/Modules/module.modulemap $(USAGE_ENVIRONMENT_HEADERS) $(BASIC_USAGE_ENVIRONMENT_HEADERS) $(GROUPSOCK_HEADERS) $(LIVEMEDIA_HEADERS)
 	echo "}" >> $(LIVEMEDIA_FRAMEWORK)/Modules/module.modulemap
 	install -m 644 Info.plist $(LIVEMEDIA_FRAMEWORK)
+	plutil -insert MinimumOSVersion -string $(MINIMUM_OS_VERSION) $(LIVEMEDIA_FRAMEWORK)/Info.plist
+
+$(LIVEMEDIA_DSYM): $(LIVEMEDIA_LIB)
+	dsymutil $(LIVEMEDIA_LIB) -o $(LIVEMEDIA_DSYM)
+	strip -S $(LIVEMEDIA_LIB)
 
 Media.$(CPP):		include/Media.hh
 include/Media.hh:	include/liveMedia_version.hh

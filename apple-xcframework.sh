@@ -12,10 +12,11 @@ for PLATFORM in "${PLATFORMS[@]}"; do
 
     mkdir -p "build/$PLATFORM"
     mv liveMedia/liveMedia.framework "build/$PLATFORM"
+    mv liveMedia/liveMedia.framework.dSYM "build/$PLATFORM"
 
     make distclean
 
-    FRAMEWORKS="$FRAMEWORKS -framework build/$PLATFORM/liveMedia.framework"
+    FRAMEWORKS="$FRAMEWORKS -framework $PWD/build/$PLATFORM/liveMedia.framework -debug-symbols $PWD/build/$PLATFORM/liveMedia.framework.dSYM"
 done
 
 xcodebuild -create-xcframework $FRAMEWORKS -output build/liveMedia.xcframework

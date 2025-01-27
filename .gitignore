@@ -10,3 +10,7 @@ compile_commands.json
 *.265
 *.ts
 *.framework
+*.xcframework
+*.xcframework.zip
+*.dSYM
+*.dSYM.zip

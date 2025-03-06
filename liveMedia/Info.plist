@@ -22,5 +22,7 @@
 	<string>????</string>
 	<key>CFBundleVersion</key>
 	<string>1729728000</string>
+	<key>MinimumOSVersion</key>
+	<string></string>
 </dict>
 </plist>

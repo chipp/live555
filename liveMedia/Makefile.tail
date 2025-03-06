@@ -75,40 +75,39 @@ GROUPSOCK_DIR = ../groupsock
 GROUPSOCK_LIB = $(GROUPSOCK_DIR)/libgroupsock.$(libgroupsock_LIB_SUFFIX)
 LIBS_FOR_LIVEMEDIA_LIB = -Wl,-force_load,$(USAGE_ENVIRONMENT_LIB) -Wl,-force_load,$(BASIC_USAGE_ENVIRONMENT_LIB) -Wl,-force_load,$(GROUPSOCK_LIB)
 
-$(LIVEMEDIA_FRAMEWORK)/Versions/A:
-	install -d $(LIVEMEDIA_FRAMEWORK)/Versions/A
+$(LIVEMEDIA_FRAMEWORK): $(LIVEMEDIA_FRAMEWORK)/$(NAME) $(LIVEMEDIA_FRAMEWORK)/Header $(LIVEMEDIA_FRAMEWORK)/Modules $(LIVEMEDIA_FRAMEWORK)/Resources
+	echo "}" >> $(LIVEMEDIA_FRAMEWORK)/Versions/A/Modules/module.modulemap
+	plutil -replace MinimumOSVersion -string $(MINIMUM_OS_VERSION) $(LIVEMEDIA_FRAMEWORK)/Versions/A/Resources/Info.plist
 
-$(LIVEMEDIA_FRAMEWORK)/Versions/A/Headers: $(LIVEMEDIA_FRAMEWORK)/Versions/A
-	install -d $(LIVEMEDIA_FRAMEWORK)/Versions/A/Headers
 
-$(LIVEMEDIA_FRAMEWORK)/Versions/A/Modules: $(LIVEMEDIA_FRAMEWORK)/Versions/A
-	install -d $(LIVEMEDIA_FRAMEWORK)/Versions/A/Modules
+$(LIVEMEDIA_FRAMEWORK)/$(NAME): $(LIVEMEDIA_FRAMEWORK)/Versions/Current
+	install -l rs Versions/Current/$(NAME) $(LIVEMEDIA_FRAMEWORK)/$(NAME)
 
-$(LIVEMEDIA_FRAMEWORK)/Versions/A/Resources: $(LIVEMEDIA_FRAMEWORK)/Versions/A
-	install -d $(LIVEMEDIA_FRAMEWORK)/Versions/A/Resources
+$(LIVEMEDIA_FRAMEWORK)/Header: $(LIVEMEDIA_FRAMEWORK)/Versions/Current
+	install -l rs Versions/Current/Headers $(LIVEMEDIA_FRAMEWORK)/Headers
+
+$(LIVEMEDIA_FRAMEWORK)/Modules: $(LIVEMEDIA_FRAMEWORK)/Versions/Current
+	install -l rs Versions/Current/Modules $(LIVEMEDIA_FRAMEWORK)/Modules
+
+$(LIVEMEDIA_FRAMEWORK)/Resources: $(LIVEMEDIA_FRAMEWORK)/Versions/Current
+	install -l rs A $(LIVEMEDIA_FRAMEWORK)/Versions/Current
+	install -l rs Versions/Current/Resources $(LIVEMEDIA_FRAMEWORK)/Resources
+
 
 $(LIVEMEDIA_FRAMEWORK)/Versions/Current: $(LIVEMEDIA_FRAMEWORK)/Versions/A
 	install -l rs A $(LIVEMEDIA_FRAMEWORK)/Versions/Current
 
-$(LIVEMEDIA_FRAMEWORK)/Versions/Current/Headers: $(LIVEMEDIA_FRAMEWORK)/Versions/A/Headers $(LIVEMEDIA_FRAMEWORK)/Versions/Current
-$(LIVEMEDIA_FRAMEWORK)/Versions/Current/Modules: $(LIVEMEDIA_FRAMEWORK)/Versions/A/Modules $(LIVEMEDIA_FRAMEWORK)/Versions/Current
-$(LIVEMEDIA_FRAMEWORK)/Versions/Current/Resources: $(LIVEMEDIA_FRAMEWORK)/Versions/A/Resources $(LIVEMEDIA_FRAMEWORK)/Versions/Current
 
-$(LIVEMEDIA_FRAMEWORK)/$(NAME): $(LIVEMEDIA_LIB)
-	install -l rs Versions/Current/$(NAME) $(LIVEMEDIA_FRAMEWORK)/$(NAME)
+$(LIVEMEDIA_FRAMEWORK)/Versions/A: $(LIVEMEDIA_FRAMEWORK)/Versions/A/Resources $(LIVEMEDIA_LIB) $(LIVEMEDIA_FRAMEWORK)/Versions/A/Modules $(LIVEMEDIA_FRAMEWORK)/Versions/A/Headers
 
-$(LIVEMEDIA_FRAMEWORK)/Header: $(LIVEMEDIA_FRAMEWORK)/Versions/Current/Headers
-	install -l rs Versions/Current/Headers $(LIVEMEDIA_FRAMEWORK)/Headers
+USAGE_ENVIRONMENT_HEADERS := $(addprefix $(LIVEMEDIA_FRAMEWORK)/Versions/A/Headers/,$(notdir $(wildcard $(USAGE_ENVIRONMENT_DIR)/include/*.hh $(USAGE_ENVIRONMENT_DIR)/include/*.h)))
+BASIC_USAGE_ENVIRONMENT_HEADERS := $(addprefix $(LIVEMEDIA_FRAMEWORK)/Versions/A/Headers/,$(notdir $(wildcard $(BASIC_USAGE_ENVIRONMENT_DIR)/include/*.hh $(BASIC_USAGE_ENVIRONMENT_DIR)/include/*.h)))
+GROUPSOCK_HEADERS := $(addprefix $(LIVEMEDIA_FRAMEWORK)/Versions/A/Headers/,$(notdir $(wildcard $(GROUPSOCK_DIR)/include/*.hh $(GROUPSOCK_DIR)/include/*.h)))
+LIVEMEDIA_HEADERS := $(addprefix $(LIVEMEDIA_FRAMEWORK)/Versions/A/Headers/,$(notdir $(wildcard include/*.hh include/*.h)))
 
-$(LIVEMEDIA_FRAMEWORK)/Modules: $(LIVEMEDIA_FRAMEWORK)/Versions/A/Modules
-	install -l rs Versions/Current/Modules $(LIVEMEDIA_FRAMEWORK)/Modules
-
-$(LIVEMEDIA_FRAMEWORK)/Resources: $(LIVEMEDIA_FRAMEWORK)/Versions/A/Resources
-	install -l rs Versions/Current/Resources $(LIVEMEDIA_FRAMEWORK)/Resources
-
-$(LIVEMEDIA_FRAMEWORK): $(LIVEMEDIA_FRAMEWORK)/Header $(LIVEMEDIA_FRAMEWORK)/Modules $(LIVEMEDIA_FRAMEWORK)/Resources $(LIVEMEDIA_FRAMEWORK)/$(NAME) $(LIVEMEDIA_FRAMEWORK)/Versions/A/Resources/Info.plist | $(LIVEMEDIA_FRAMEWORK)/Versions/A/Modules/module.modulemap $(USAGE_ENVIRONMENT_HEADERS) $(BASIC_USAGE_ENVIRONMENT_HEADERS) $(GROUPSOCK_HEADERS) $(LIVEMEDIA_HEADERS)
-	echo "}" >> $(LIVEMEDIA_FRAMEWORK)/Versions/A/Modules/module.modulemap
-	plutil -insert MinimumOSVersion -string $(MINIMUM_OS_VERSION) $(LIVEMEDIA_FRAMEWORK)/Versions/A/Resources/Info.plist
+$(LIVEMEDIA_FRAMEWORK)/Versions/A/Headers: | $(USAGE_ENVIRONMENT_HEADERS) $(BASIC_USAGE_ENVIRONMENT_HEADERS) $(GROUPSOCK_HEADERS) $(LIVEMEDIA_HEADERS)
+$(LIVEMEDIA_FRAMEWORK)/Versions/A/Modules: $(LIVEMEDIA_FRAMEWORK)/Versions/A/Modules/module.modulemap
+$(LIVEMEDIA_FRAMEWORK)/Versions/A/Resources: $(LIVEMEDIA_FRAMEWORK)/Versions/A/Resources/Info.plist
 
 $(LIVEMEDIA_DSYM): $(LIVEMEDIA_LIB)
 	dsymutil $(LIVEMEDIA_LIB) -o $(LIVEMEDIA_DSYM)
@@ -122,38 +121,40 @@ $(LIVEMEDIA_LIB): $(LIVEMEDIA_LIB_OBJS) \
 		-install_name "@rpath/$(NAME).framework/$(NAME)" \
 		$(LIVEMEDIA_LIB_OBJS) $(LIBS_FOR_LIVEMEDIA_LIB)
 
-USAGE_ENVIRONMENT_HEADERS = $(addprefix $(LIVEMEDIA_FRAMEWORK)/Versions/A/Headers/,$(notdir $(wildcard $(USAGE_ENVIRONMENT_DIR)/include/*.hh $(USAGE_ENVIRONMENT_DIR)/include/*.h)))
-$(USAGE_ENVIRONMENT_HEADERS): $(LIVEMEDIA_FRAMEWORK)/Versions/A/Headers
+$(USAGE_ENVIRONMENT_HEADERS):
+	install -d $(LIVEMEDIA_FRAMEWORK)/Versions/A/Headers
 	sed -r 's/#include "([A-Za-z0-9_]+\.hh?)"/#include <liveMedia\/\1>/g' \
 			$(USAGE_ENVIRONMENT_DIR)/include/$(notdir $@) > $@
 	echo "  header \"$(notdir $@)\"" >> $(LIVEMEDIA_FRAMEWORK)/Versions/A/Modules/module.modulemap
 
-BASIC_USAGE_ENVIRONMENT_HEADERS = $(addprefix $(LIVEMEDIA_FRAMEWORK)/Versions/A/Headers/,$(notdir $(wildcard $(BASIC_USAGE_ENVIRONMENT_DIR)/include/*.hh $(BASIC_USAGE_ENVIRONMENT_DIR)/include/*.h)))
-$(BASIC_USAGE_ENVIRONMENT_HEADERS): $(LIVEMEDIA_FRAMEWORK)/Versions/A/Headers
+$(BASIC_USAGE_ENVIRONMENT_HEADERS):
+	install -d $(LIVEMEDIA_FRAMEWORK)/Versions/A/Headers
 	sed -r 's/#include "([A-Za-z0-9_]+\.hh?)"/#include <liveMedia\/\1>/g' \
 			$(BASIC_USAGE_ENVIRONMENT_DIR)/include/$(notdir $@) > $@
 	echo "  header \"$(notdir $@)\"" >> $(LIVEMEDIA_FRAMEWORK)/Versions/A/Modules/module.modulemap
 
-GROUPSOCK_HEADERS = $(addprefix $(LIVEMEDIA_FRAMEWORK)/Versions/A/Headers/,$(notdir $(wildcard $(GROUPSOCK_DIR)/include/*.hh $(GROUPSOCK_DIR)/include/*.h)))
-$(GROUPSOCK_HEADERS): $(LIVEMEDIA_FRAMEWORK)/Versions/A/Headers
+$(GROUPSOCK_HEADERS):
+	install -d $(LIVEMEDIA_FRAMEWORK)/Versions/A/Headers
 	sed -r 's/#include "([A-Za-z0-9_]+\.hh?)"/#include <liveMedia\/\1>/g' \
 			$(GROUPSOCK_DIR)/include/$(notdir $@) > $@
 	echo "  header \"$(notdir $@)\"" >> $(LIVEMEDIA_FRAMEWORK)/Versions/A/Modules/module.modulemap
 
-LIVEMEDIA_HEADERS = $(addprefix $(LIVEMEDIA_FRAMEWORK)/Versions/A/Headers/,$(notdir $(wildcard include/*.hh include/*.h)))
-$(LIVEMEDIA_HEADERS): $(LIVEMEDIA_FRAMEWORK)/Versions/A/Headers
+$(LIVEMEDIA_HEADERS):
+	install -d $(LIVEMEDIA_FRAMEWORK)/Versions/A/Headers
 	sed -r 's/#include "([A-Za-z0-9_]+\.hh?)"/#include <liveMedia\/\1>/g ; \
 			s/#include <Groupsock.hh>/#include <liveMedia\/Groupsock.hh>/g ; \
 			s/#include <UsageEnvironment.hh>/#include <liveMedia\/UsageEnvironment.hh>/g ; \
 			s/#include <NetCommon.h>/#include <liveMedia\/NetCommon.h>/g' include/$(notdir $@) > $@
 	echo "  header \"$(notdir $@)\"" >> $(LIVEMEDIA_FRAMEWORK)/Versions/A/Modules/module.modulemap
 
-$(LIVEMEDIA_FRAMEWORK)/Versions/A/Modules/module.modulemap: $(LIVEMEDIA_FRAMEWORK)/Versions/A/Modules
+$(LIVEMEDIA_FRAMEWORK)/Versions/A/Modules/module.modulemap:
+	install -d $(LIVEMEDIA_FRAMEWORK)/Versions/A/Modules
 	echo "framework module liveMedia {" > $(LIVEMEDIA_FRAMEWORK)/Versions/A/Modules/module.modulemap
 	echo "  requires cplusplus" >> $(LIVEMEDIA_FRAMEWORK)/Versions/A/Modules/module.modulemap
 	echo "  umbrella header \"liveMedia.hh\"" >> $(LIVEMEDIA_FRAMEWORK)/Versions/A/Modules/module.modulemap
 
-$(LIVEMEDIA_FRAMEWORK)/Versions/A/Resources/Info.plist: $(LIVEMEDIA_FRAMEWORK)/Versions/A/Resources
+$(LIVEMEDIA_FRAMEWORK)/Versions/A/Resources/Info.plist:
+	install -d $(LIVEMEDIA_FRAMEWORK)/Versions/A/Resources
 	install -m 644 Info.plist $(LIVEMEDIA_FRAMEWORK)/Versions/A/Resources
 
 Media.$(CPP):		include/Media.hh

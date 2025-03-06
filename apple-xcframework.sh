@@ -20,3 +20,7 @@ for PLATFORM in "${PLATFORMS[@]}"; do
 done
 
 xcodebuild -create-xcframework $FRAMEWORKS -output build/liveMedia.xcframework
+
+cd build
+zip -y -r -X liveMedia.xcframework.zip liveMedia.xcframework
+cd ..

@@ -23,4 +23,5 @@ xcodebuild -create-xcframework $FRAMEWORKS -output build/liveMedia.xcframework
 
 cd build
 zip -y -r -X liveMedia.xcframework.zip liveMedia.xcframework
+swift package compute-checksum liveMedia.xcframework.zip
 cd ..

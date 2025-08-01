@@ -1,5 +1,5 @@
-TARGET = 						arm64-apple-ios18.2
-MINIMUM_OS_VERSION =			18.0
+TARGET = 						arm64-apple-ios18.5
+MINIMUM_OS_VERSION =			17.0
 DEVELOPER_PATH =				/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer
 TOOL_PATH =						$(DEVELOPER_PATH)/usr/bin
 SDK_PATH =						$(DEVELOPER_PATH)/SDKs

@@ -21,6 +21,7 @@ LINK_OPTS =						-v -Xlinker -L. -isysroot $(SDK) $(ARCHS) -L$(SDK)/usr/lib -lc+
 DYNAMIC_LIBRARY_LINK =			$(LINK)
 DYNAMIC_LIBRARY_LINK_OPTS =		$(LINK_OPTS) -dynamiclib -current_version 1.0 -compatibility_version 1.0
 DYNAMIC_LIB_SUFFIX =			dylib
+MACOS_FRAMEWORK_LAYOUT =        1
 
 STATIC_LIBRARY_LINK =			libtool -static -o 
 STATIC_LIBRARY_LINK_OPTS =		

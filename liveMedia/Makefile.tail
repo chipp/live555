@@ -76,22 +76,8 @@ LIBS_FOR_LIVEMEDIA_LIB = -Wl,-force_load,$(USAGE_ENVIRONMENT_LIB) -Wl,-force_loa
 
 ifeq ($(MACOS_FRAMEWORK_LAYOUT), 1)
 	LAYOUT_PREFIX = $(LIVEMEDIA_FRAMEWORK)/Versions/A
-else
-	LAYOUT_PREFIX = $(LIVEMEDIA_FRAMEWORK)
-endif
+	INFO_PLIST = $(LIVEMEDIA_FRAMEWORK)/Versions/A/Resources/Info.plist
 
-LIVEMEDIA_LIB := $(LAYOUT_PREFIX)/$(NAME)
-
-USAGE_ENVIRONMENT_HEADERS := $(addprefix $(LAYOUT_PREFIX)/Headers/,$(notdir $(wildcard $(USAGE_ENVIRONMENT_DIR)/include/*.hh $(USAGE_ENVIRONMENT_DIR)/include/*.h)))
-BASIC_USAGE_ENVIRONMENT_HEADERS := $(addprefix $(LAYOUT_PREFIX)/Headers/,$(notdir $(wildcard $(BASIC_USAGE_ENVIRONMENT_DIR)/include/*.hh $(BASIC_USAGE_ENVIRONMENT_DIR)/include/*.h)))
-GROUPSOCK_HEADERS := $(addprefix $(LAYOUT_PREFIX)/Headers/,$(notdir $(wildcard $(GROUPSOCK_DIR)/include/*.hh $(GROUPSOCK_DIR)/include/*.h)))
-LIVEMEDIA_HEADERS := $(addprefix $(LAYOUT_PREFIX)/Headers/,$(notdir $(wildcard include/*.hh include/*.h)))
-
-$(LAYOUT_PREFIX)/Headers: | $(USAGE_ENVIRONMENT_HEADERS) $(BASIC_USAGE_ENVIRONMENT_HEADERS) $(GROUPSOCK_HEADERS) $(LIVEMEDIA_HEADERS)
-$(LAYOUT_PREFIX)/Modules: $(LAYOUT_PREFIX)/Modules/module.modulemap
-$(LAYOUT_PREFIX)/Resources: $(LAYOUT_PREFIX)/Resources/Info.plist
-
-ifeq ($(MACOS_FRAMEWORK_LAYOUT), 1)
 $(LIVEMEDIA_FRAMEWORK)/$(NAME): $(LIVEMEDIA_FRAMEWORK)/Versions/Current
 	install -l rs Versions/Current/$(NAME) $(LIVEMEDIA_FRAMEWORK)/$(NAME)
 
@@ -108,8 +94,28 @@ $(LIVEMEDIA_FRAMEWORK)/Resources: $(LIVEMEDIA_FRAMEWORK)/Versions/Current
 $(LIVEMEDIA_FRAMEWORK)/Versions/Current: $(LIVEMEDIA_FRAMEWORK)/Versions/A
 	install -l rs A $(LIVEMEDIA_FRAMEWORK)/Versions/Current
 
-$(LIVEMEDIA_FRAMEWORK)/Versions/A: $(LIVEMEDIA_FRAMEWORK)/Versions/A/Resources $(LIVEMEDIA_LIB) $(LIVEMEDIA_FRAMEWORK)/Versions/A/Modules $(LIVEMEDIA_FRAMEWORK)/Versions/A/Headers
+$(LIVEMEDIA_FRAMEWORK)/Versions/A: $(INFO_PLIST) $(LIVEMEDIA_LIB) $(LIVEMEDIA_FRAMEWORK)/Versions/A/Modules $(LIVEMEDIA_FRAMEWORK)/Versions/A/Headers
+
+$(INFO_PLIST):
+	install -d $(LIVEMEDIA_FRAMEWORK)/Versions/A/Resources
+	install -m 644 Info.plist $(LIVEMEDIA_FRAMEWORK)/Versions/A/Resources
+else
+	LAYOUT_PREFIX = $(LIVEMEDIA_FRAMEWORK)
+	INFO_PLIST = $(LIVEMEDIA_FRAMEWORK)/Info.plist
+
+$(INFO_PLIST):
+	install -m 644 Info.plist $(LIVEMEDIA_FRAMEWORK)
 endif
+
+LIVEMEDIA_LIB := $(LAYOUT_PREFIX)/$(NAME)
+
+USAGE_ENVIRONMENT_HEADERS := $(addprefix $(LAYOUT_PREFIX)/Headers/,$(notdir $(wildcard $(USAGE_ENVIRONMENT_DIR)/include/*.hh $(USAGE_ENVIRONMENT_DIR)/include/*.h)))
+BASIC_USAGE_ENVIRONMENT_HEADERS := $(addprefix $(LAYOUT_PREFIX)/Headers/,$(notdir $(wildcard $(BASIC_USAGE_ENVIRONMENT_DIR)/include/*.hh $(BASIC_USAGE_ENVIRONMENT_DIR)/include/*.h)))
+GROUPSOCK_HEADERS := $(addprefix $(LAYOUT_PREFIX)/Headers/,$(notdir $(wildcard $(GROUPSOCK_DIR)/include/*.hh $(GROUPSOCK_DIR)/include/*.h)))
+LIVEMEDIA_HEADERS := $(addprefix $(LAYOUT_PREFIX)/Headers/,$(notdir $(wildcard include/*.hh include/*.h)))
+
+$(LAYOUT_PREFIX)/Headers: | $(USAGE_ENVIRONMENT_HEADERS) $(BASIC_USAGE_ENVIRONMENT_HEADERS) $(GROUPSOCK_HEADERS) $(LIVEMEDIA_HEADERS)
+$(LAYOUT_PREFIX)/Modules: $(LAYOUT_PREFIX)/Modules/module.modulemap
 
 $(LIVEMEDIA_DSYM): $(LIVEMEDIA_LIB)
 	dsymutil $(LIVEMEDIA_LIB) -o $(LIVEMEDIA_DSYM)
@@ -156,13 +162,9 @@ $(LAYOUT_PREFIX)/Modules/module.modulemap:
 	echo "  requires cplusplus" >> $(LAYOUT_PREFIX)/Modules/module.modulemap
 	echo "  umbrella header \"liveMedia.hh\"" >> $(LAYOUT_PREFIX)/Modules/module.modulemap
 
-$(LAYOUT_PREFIX)/Resources/Info.plist:
-	install -d $(LAYOUT_PREFIX)/Resources
-	install -m 644 Info.plist $(LAYOUT_PREFIX)/Resources
-
-$(LIVEMEDIA_FRAMEWORK): $(LIVEMEDIA_FRAMEWORK)/Modules $(LIVEMEDIA_FRAMEWORK)/$(NAME) $(LIVEMEDIA_FRAMEWORK)/Headers $(LIVEMEDIA_FRAMEWORK)/Resources
+$(LIVEMEDIA_FRAMEWORK): $(LIVEMEDIA_FRAMEWORK)/Modules $(LIVEMEDIA_FRAMEWORK)/$(NAME) $(LIVEMEDIA_FRAMEWORK)/Headers $(INFO_PLIST)
 	echo "}" >> $(LIVEMEDIA_FRAMEWORK)/Modules/module.modulemap
-	plutil -replace MinimumOSVersion -string $(MINIMUM_OS_VERSION) $(LIVEMEDIA_FRAMEWORK)/Resources/Info.plist
+	plutil -replace MinimumOSVersion -string $(MINIMUM_OS_VERSION) $(INFO_PLIST)
 
 Media.$(CPP):		include/Media.hh
 include/Media.hh:	include/liveMedia_version.hh
